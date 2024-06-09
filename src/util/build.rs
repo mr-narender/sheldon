@@ -24,6 +24,7 @@ pub const CRATE_NAME: &str = env!("CARGO_PKG_NAME");
 pub const CRATE_RELEASE: &str = env!("CARGO_PKG_VERSION");
 
 /// The version including any available Git information.
+#[allow(clippy::const_is_empty)]
 pub const CRATE_VERSION: &str = {
     const GIT_COMMIT_DATE: &str = env_or_default!("GIT_COMMIT_DATE");
     const GIT_COMMIT_HASH: &str = env_or_default!("GIT_COMMIT_HASH");

@@ -381,8 +381,9 @@ mod tests {
         fs::create_dir_all(&test_dir).unwrap();
         {
             fs::OpenOptions::new()
-                .create(true)
                 .write(true)
+                .create(true)
+                .truncate(true)
                 .open(&test_file)
                 .unwrap();
         }

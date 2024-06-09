@@ -166,8 +166,9 @@ fn lock_and_source_clean() -> io::Result<()> {
     fs::create_dir_all(data.join("repos/test.com"))?;
     {
         fs::OpenOptions::new()
-            .create(true)
             .write(true)
+            .create(true)
+            .truncate(true)
             .open(data.join("repos/test.com/test.txt"))?;
     }
 
@@ -185,8 +186,9 @@ fn lock_and_source_clean_permission_denied() -> io::Result<()> {
     fs::create_dir_all(data.join("repos/test.com"))?;
     {
         fs::OpenOptions::new()
-            .create(true)
             .write(true)
+            .create(true)
+            .truncate(true)
             .open(data.join("repos/test.com/test.txt"))?;
     }
     fs::set_permissions(

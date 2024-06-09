@@ -1,6 +1,5 @@
 pub mod build;
 pub mod git;
-mod path_ext;
 mod temp;
 
 use std::fs::File;
