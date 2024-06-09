@@ -23,9 +23,9 @@ raw = """
 post = "post"
 
 [templates]
-PATH = "export PATH=\"{{ dir }}:$PATH\""
-path = "path=( \"{{ dir }}\" $path )"
-fpath = "fpath=( \"{{ dir }}\" $fpath )"
-source = """
-{{ hooks?.pre | nl }}{% for file in files %}source \"{{ file }}\"
-{% endfor %}{{ hooks?.post | nl }}"""
+PATH = 'export PATH="{{ dir }}:$PATH"'
+path = 'path=( "{{ dir }}" $path )'
+fpath = 'fpath=( "{{ dir }}" $fpath )'
+source = '''
+{{ hooks?.pre | nl }}{% for file in files %}source "{{ file }}"
+{% endfor %}{{ hooks?.post | nl }}'''

@@ -255,4 +255,8 @@ _sheldon() {
     esac
 }
 
-complete -F _sheldon -o nosort -o bashdefault -o default sheldon
+if [[ "${BASH_VERSINFO[0]}" -eq 4 && "${BASH_VERSINFO[1]}" -ge 4 || "${BASH_VERSINFO[0]}" -gt 4 ]]; then
+    complete -F _sheldon -o nosort -o bashdefault -o default sheldon
+else
+    complete -F _sheldon -o bashdefault -o default sheldon
+fi

@@ -18,7 +18,7 @@ pub struct EditPlugin {
 #[derive(Debug)]
 pub struct EditConfig {
     /// The parsed TOML version of the config.
-    doc: toml_edit::Document,
+    doc: toml_edit::DocumentMut,
 }
 
 impl From<RawPlugin> for EditPlugin {
@@ -58,7 +58,7 @@ impl EditConfig {
     {
         let doc = s
             .as_ref()
-            .parse::<toml_edit::Document>()
+            .parse::<toml_edit::DocumentMut>()
             .context("failed to deserialize contents as TOML")?;
         Ok(Self { doc })
     }
@@ -80,7 +80,7 @@ impl EditConfig {
             toml::to_string_pretty(&plugin.inner).expect("failed to serialize plugin as TOML");
 
         let mini = contents
-            .parse::<toml_edit::Document>()
+            .parse::<toml_edit::DocumentMut>()
             .expect("failed to parse valid TOML");
 
         match &mut self.doc["plugins"] {
