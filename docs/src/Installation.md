@@ -1,5 +1,13 @@
 # 📦 Installation
 
+## Nix
+
+This repository is a flake, and can be installed using nix profile:
+
+```
+nix profile install "github:rossmacarthur/sheldon"
+```
+
 ## Homebrew
 
 Sheldon can be installed using Homebrew.

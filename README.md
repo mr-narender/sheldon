@@ -30,6 +30,7 @@
 ## Table of Contents
 
 - [📦 Installation](#-installation)
+  - [Nix](#nix)
   - [Homebrew](#homebrew)
   - [Cargo](#cargo)
   - [Cargo BInstall](#cargo-binstall)
@@ -80,6 +81,14 @@
 - [License](#license)
 
 ## 📦 Installation
+
+### Nix
+
+This repository is a flake, and can be installed using nix profile:
+
+```
+nix profile install "github:rossmacarthur/sheldon"
+```
 
 ### Homebrew
 
