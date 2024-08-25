@@ -16,7 +16,7 @@ use clap::{CommandFactory, Parser};
 
 use crate::cli::raw::{Add, RawCommand, RawOpt};
 use crate::config::{EditPlugin, GitReference, RawPlugin, Shell};
-use crate::context::{log_error, log_error_as_warning, Context, Output, Verbosity};
+use crate::context::{log_error, Context, Output, Verbosity};
 use crate::lock::LockMode;
 use crate::util::build;
 
@@ -129,8 +129,8 @@ impl Opt {
             }
         };
 
-        let (config_file, config_dir, data_dir) =
-            match resolve_paths(&home, config_file, config_dir, data_dir, output.no_color) {
+        let (config_dir, data_dir, config_file) =
+            match resolve_paths(&home, config_dir, data_dir, config_file) {
                 Ok(paths) => paths,
                 Err(err) => {
                     log_error(output.no_color, &err);
@@ -240,30 +240,15 @@ impl LockMode {
 
 fn resolve_paths(
     home: &Path,
-    config_file: Option<PathBuf>,
     config_dir: Option<PathBuf>,
     data_dir: Option<PathBuf>,
-    no_color: bool,
+    config_file: Option<PathBuf>,
 ) -> Result<(PathBuf, PathBuf, PathBuf)> {
-    // TODO: Remove this warning in a later release and stop falling back to
-    // the old directory.
-    let err = anyhow!(
-        r#"using deprecated config file location ~/.sheldon/plugins.toml.
-
-To use the new location move the config file to
-~/.config/sheldon/plugins.toml ($XDG_CONFIG_HOME/sheldon/plugins.toml),
-~/.sheldon can then be safely deleted.
-
-Or to instead preserve the old behaviour set the following environment variables:
-  SHELDON_CONFIG_DIR="$HOME/.sheldon"
-  SHELDON_DATA_DIR="$HOME/.sheldon"
-
-See the release notes at https://github.com/rossmacarthur/sheldon for more information.
-"#,
-    );
-    let mut using_old = false;
-    let (config_file, config_dir) = match config_file {
-        Some(file) => {
+    let (config_dir, config_file) = match (config_dir, config_file) {
+        // If both are set, then use them as is
+        (Some(dir), Some(file)) => (dir, file),
+        // If only the config file is set, then derive the directory from the file
+        (None, Some(file)) => {
             let dir = file
                 .parent()
                 .with_context(|| {
@@ -273,33 +258,24 @@ See the release notes at https://github.com/rossmacarthur/sheldon for more infor
                     )
                 })?
                 .to_path_buf();
-            (file, dir)
+            (dir, file)
         }
-        None => {
-            let dir = config_dir.unwrap_or_else(|| {
-                let default = default_config_dir(home);
-                let old = home.join(".sheldon");
-                if old.exists() && !default.exists() {
-                    log_error_as_warning(no_color, &err);
-                    using_old = true;
-                    return old;
-                }
-                default
-            });
+        // If only the config directory is set, then derive the file from the directory
+        (Some(dir), None) => {
             let file = dir.join("plugins.toml");
-            (file, dir)
+            (dir, file)
+        }
+        // If neither are set, then use the default config directory and file
+        (None, None) => {
+            let dir = default_config_dir(home);
+            let file = dir.join("plugins.toml");
+            (dir, file)
         }
     };
 
-    let data_dir = data_dir.unwrap_or_else(|| {
-        let default = default_data_dir(home);
-        if using_old && !default.exists() {
-            return config_dir.clone();
-        }
-        default
-    });
+    let data_dir = data_dir.unwrap_or_else(|| default_data_dir(home));
 
-    Ok((config_file, config_dir, data_dir))
+    Ok((config_dir, data_dir, config_file))
 }
 
 fn default_config_dir(home: &Path) -> PathBuf {

@@ -360,10 +360,12 @@ fn lock_and_source_override_config_file() -> io::Result<()> {
     fs::remove_dir(&case.dirs.config).ok();
     case.write_file(&config_file, "test.toml")?;
     case.command("lock")
+        .env_remove("SHELDON_CONFIG_DIR")
         .env("SHELDON_CONFIG_FILE", &config_file)
         .run()?;
     case.assert_contents("plugins.lock")?;
     case.command("source")
+        .env_remove("SHELDON_CONFIG_DIR")
         .env("SHELDON_CONFIG_FILE", &config_file)
         .run()?;
     Ok(())
@@ -375,10 +377,12 @@ fn lock_and_source_override_config_file_missing() -> io::Result<()> {
     let config_file = case.dirs.config.join("test.toml");
     case.command("lock")
         .expect_exit_code(2)
+        .env_remove("SHELDON_CONFIG_DIR")
         .env("SHELDON_CONFIG_FILE", &config_file)
         .run()?;
     case.command("source")
         .expect_exit_code(2)
+        .env_remove("SHELDON_CONFIG_DIR")
         .env("SHELDON_CONFIG_FILE", &config_file)
         .run()?;
     Ok(())
@@ -423,26 +427,6 @@ fn lock_and_source_deprecated_get_filter() -> io::Result<()> {
     let case = TestCase::load("deprecated_get_filter")?;
     case.run()?;
     check_sheldon_test(&case.dirs.data).unwrap();
-    Ok(())
-}
-
-#[test]
-fn deprecated_directories() -> io::Result<()> {
-    let case = TestCase::load("deprecated_directories")?;
-    let config_dir = case.dirs.home.path().join(".sheldon");
-    fs::remove_dir(&case.dirs.data).ok();
-    fs::remove_dir(&case.dirs.config).ok();
-    fs::create_dir_all(&config_dir)?;
-    case.write_file(&config_dir.join("plugins.toml"), "plugins.toml")?;
-    case.command("lock")
-        .env_remove("SHELDON_CONFIG_DIR")
-        .env_remove("SHELDON_DATA_DIR")
-        .run()?;
-    case.assert_contents_path("plugins.lock", &config_dir.join("plugins.lock"))?;
-    case.command("source")
-        .env_remove("SHELDON_CONFIG_DIR")
-        .env_remove("SHELDON_DATA_DIR")
-        .run()?;
     Ok(())
 }
 
