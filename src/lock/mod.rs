@@ -184,18 +184,6 @@ impl Shell {
                 "*.sh"
             ]
         });
-        static DEFAULT_MATCHES_FISH: Lazy<Vec<String>> = Lazy::new(|| {
-            vec_into![
-                "conf.d/{{ name }}.fish",
-                "conf.d/{!_*,*}.fish",
-                "{completions,functions}/{{ name }}.fish",
-                "{completions,functions}/{!_*,*}.fish",
-                "{completions,functions}/*.fish",
-                "{{ name }}.fish",
-                "{!_*,*}.fish",
-                "*.fish"
-            ]
-        });
         static DEFAULT_MATCHES_ZSH: Lazy<Vec<String>> = Lazy::new(|| {
             vec_into![
                 "{{ name }}.plugin.zsh",
@@ -210,7 +198,6 @@ impl Shell {
         });
         match self {
             Self::Bash => &DEFAULT_MATCHES_BASH,
-            Self::Fish => &DEFAULT_MATCHES_FISH,
             Self::Zsh => &DEFAULT_MATCHES_ZSH,
         }
     }
@@ -220,12 +207,6 @@ impl Shell {
         static DEFAULT_TEMPLATES_BASH: Lazy<IndexMap<String, String>> = Lazy::new(|| {
             indexmap_into! {
                 "PATH" => "export PATH=\"{{ dir }}:$PATH\"",
-                "source" => "{{ hooks?.pre | nl }}{% for file in files %}source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
-            }
-        });
-        static DEFAULT_TEMPLATES_FISH: Lazy<IndexMap<String, String>> = Lazy::new(|| {
-            indexmap_into! {
-                "add_path" => "fish_add_path \"{{ dir }}\"",
                 "source" => "{{ hooks?.pre | nl }}{% for file in files %}source \"{{ file }}\"\n{% endfor %}{{ hooks?.post | nl }}"
             }
         });
@@ -239,7 +220,6 @@ impl Shell {
         });
         match self {
             Self::Bash => &DEFAULT_TEMPLATES_BASH,
-            Self::Fish => &DEFAULT_TEMPLATES_FISH,
             Self::Zsh => &DEFAULT_TEMPLATES_ZSH,
         }
     }

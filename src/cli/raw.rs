@@ -212,13 +212,12 @@ impl clap::ValueEnum for ColorChoice {
 
 impl clap::ValueEnum for Shell {
     fn value_variants<'a>() -> &'a [Self] {
-        &[Shell::Bash, Shell::Fish, Shell::Zsh]
+        &[Shell::Bash, Shell::Zsh]
     }
 
     fn to_possible_value(&self) -> Option<PossibleValue> {
         Some(match self {
             Shell::Bash => PossibleValue::new("bash"),
-            Shell::Fish => PossibleValue::new("fish"),
             Shell::Zsh => PossibleValue::new("zsh"),
         })
     }

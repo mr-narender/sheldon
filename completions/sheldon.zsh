@@ -40,7 +40,7 @@ _sheldon() {
         case $line[1] in
             (init)
 _arguments "${_arguments_options[@]}" : \
-'--shell=[The type of shell]:SHELL:(bash fish zsh)' \
+'--shell=[The type of shell]:SHELL:(bash zsh)' \
 '-h[Print help]' \
 '--help[Print help]' \
 && ret=0

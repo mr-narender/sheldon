@@ -186,7 +186,7 @@ _sheldon() {
             fi
             case "${prev}" in
                 --shell)
-                    COMPREPLY=($(compgen -W "bash fish zsh" -- "${cur}"))
+                    COMPREPLY=($(compgen -W "bash zsh" -- "${cur}"))
                     return 0
                     ;;
                 *)
