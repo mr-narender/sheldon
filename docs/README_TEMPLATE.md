@@ -20,10 +20,10 @@
 - Local plugins.
 - Inline plugins.
 - Highly configurable install methods using templates.
-- Shell agnostic, with sensible defaults for Zsh.
+- Shell agnostic, with sensible defaults for Bash or Zsh
 - Super-fast plugin loading and parallel installation. See [benchmarks].
 - Config file using [TOML](https://toml.io) syntax.
-- Clean `~/.zshrc` or `~/.bashrc` (just add 1 line).
+- Clean  `~/.bashrc` or `~/.zshrc` (just add 1 line).
 
 [benchmarks]: https://github.com/rossmacarthur/zsh-plugin-manager-benchmark
 

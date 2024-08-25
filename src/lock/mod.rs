@@ -57,7 +57,9 @@ pub fn config(ctx: &Context, config: Config) -> Result<LockedConfig> {
     } = config;
 
     let templates = {
-        let mut map = shell.default_templates().clone();
+        let mut map = shell
+            .map(|s| s.default_templates().clone())
+            .unwrap_or_default();
         for (name, template) in templates {
             map.insert(name, template);
         }
@@ -88,8 +90,10 @@ pub fn config(ctx: &Context, config: Config) -> Result<LockedConfig> {
 
     let matches = matches
         .as_deref()
-        .unwrap_or_else(|| shell.default_matches());
-    let apply = apply.as_ref().unwrap_or_else(|| Shell::default_apply());
+        .or_else(|| shell.map(|s| s.default_matches()));
+    let apply = apply
+        .as_deref()
+        .or_else(|| shell.map(|s| s.default_apply()));
     let count = map.len();
     let mut errors = Vec::new();
 
@@ -171,7 +175,7 @@ pub fn config(ctx: &Context, config: Config) -> Result<LockedConfig> {
 
 impl Shell {
     /// The default files to match on for this shell.
-    fn default_matches(&self) -> &[String] {
+    fn default_matches(&self) -> &'static [String] {
         static DEFAULT_MATCHES_BASH: Lazy<Vec<String>> = Lazy::new(|| {
             vec_into![
                 "{{ name }}.plugin.bash",
@@ -225,7 +229,7 @@ impl Shell {
     }
 
     /// The default template names to apply.
-    fn default_apply() -> &'static Vec<String> {
+    fn default_apply(&self) -> &'static [String] {
         static DEFAULT_APPLY: Lazy<Vec<String>> = Lazy::new(|| vec_into!["source"]);
         &DEFAULT_APPLY
     }
@@ -316,7 +320,7 @@ mod tests {
         let dir = temp.path();
         let ctx = Context::testing(dir);
         let cfg = Config {
-            shell: Shell::Zsh,
+            shell: Some(Shell::Zsh),
             matches: None,
             apply: None,
             templates: IndexMap::new(),
@@ -327,10 +331,7 @@ mod tests {
 
         assert_eq!(locked.ctx, ctx);
         assert_eq!(locked.plugins, Vec::new());
-        assert_eq!(
-            locked.templates,
-            Shell::default().default_templates().clone(),
-        );
+        assert_eq!(locked.templates, Shell::Zsh.default_templates().clone(),);
         assert_eq!(locked.errors.len(), 0);
     }
 
@@ -339,7 +340,7 @@ mod tests {
         let temp = tempfile::tempdir().expect("create temporary directory");
         let ctx = Context::testing(temp.path());
         let cfg = Config {
-            shell: Shell::Zsh,
+            shell: Some(Shell::Zsh),
             matches: None,
             apply: None,
             templates: IndexMap::new(),

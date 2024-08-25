@@ -1,3 +1,5 @@
+shell = "zsh"
+
 [plugins.testa]
 remote = "https://raw.githubusercontent.com/rossmacarthur/sheldon-test/master/test.plugin.zsh"
 

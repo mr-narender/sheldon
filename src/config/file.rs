@@ -175,12 +175,6 @@ impl_serialize_as_str! { GitHubRepository }
 // Deserialization implementations
 ////////////////////////////////////////////////////////////////////////////////
 
-impl Default for Shell {
-    fn default() -> Self {
-        Self::Zsh
-    }
-}
-
 /// Produced when we fail to parse the shell type.
 #[derive(Debug, Error)]
 #[error("expected one of `bash` or `zsh`, got `{}`", self.0)]

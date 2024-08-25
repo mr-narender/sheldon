@@ -25,7 +25,7 @@ pub use crate::config::profile::MatchesProfile;
 #[derive(Debug)]
 pub struct Config {
     /// What type of shell is being used.
-    pub shell: Shell,
+    pub shell: Option<Shell>,
     /// Which files to match and use in a plugin's directory.
     pub matches: Option<Vec<String>>,
     /// The default list of template names to apply to each matched file.

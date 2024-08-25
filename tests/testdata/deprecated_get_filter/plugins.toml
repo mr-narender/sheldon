@@ -1,3 +1,5 @@
+shell = "zsh"
+
 [templates]
 source = """{{ hooks | get: "pre" | nl }}{% for file in files %}source "{{ file }}"\n{% endfor %}{{ hooks | get: "post" | nl }}"""
 

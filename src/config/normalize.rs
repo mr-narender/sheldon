@@ -39,8 +39,6 @@ pub fn normalize(raw_config: RawConfig, warnings: &mut Vec<Error>) -> Result<Con
             .with_context(|| format!("failed to compile template `{name}`"))?;
     }
 
-    let shell = shell.unwrap_or_default();
-
     validate_template_names(shell, &apply, &templates)?;
 
     // Normalize the plugins.
@@ -69,7 +67,7 @@ pub fn normalize(raw_config: RawConfig, warnings: &mut Vec<Error>) -> Result<Con
 fn normalize_plugin(
     raw_plugin: RawPlugin,
     name: String,
-    shell: Shell,
+    shell: Option<Shell>,
     templates: &IndexMap<String, String>,
     warnings: &mut Vec<Error>,
 ) -> Result<Plugin> {
@@ -250,14 +248,30 @@ where
 
 /// Check whether the specifed templates actually exist.
 fn validate_template_names(
-    shell: Shell,
+    shell: Option<Shell>,
     apply: &Option<Vec<String>>,
     templates: &IndexMap<String, String>,
 ) -> Result<()> {
     if let Some(apply) = apply {
         for name in apply {
-            if !shell.default_templates().contains_key(name) && !templates.contains_key(name) {
-                bail!("unknown template `{name}`");
+            if !templates.contains_key(name)
+                && !shell
+                    .map(|s| s.default_templates().contains_key(name))
+                    .unwrap_or(false)
+            {
+                match shell {
+                    Some(shell) => {
+                        if !shell.default_templates().contains_key(name) {
+                            bail!("unknown template `{name}`");
+                        }
+                    }
+                    None => {
+                        bail!(
+                            "unknown template `{name}` (help: set `shell` to use default \
+                             templates)"
+                        );
+                    }
+                }
             }
         }
     }
@@ -297,7 +311,7 @@ mod tests {
                 let err = normalize_plugin(
                     raw,
                     "test".to_string(),
-                    Shell::default(),
+                    Some(Shell::Zsh),
                     &IndexMap::new(),
                     &mut Vec::new(),
                 )
@@ -330,7 +344,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -368,7 +382,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -399,7 +413,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -437,7 +451,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -471,7 +485,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -504,7 +518,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -538,7 +552,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -568,7 +582,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -591,7 +605,7 @@ mod tests {
         let err = normalize_plugin(
             raw_plugin,
             "test".to_string(),
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -617,7 +631,7 @@ mod tests {
         let err = normalize_plugin(
             raw_plugin,
             "test".to_string(),
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -649,7 +663,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -673,7 +687,7 @@ mod tests {
         let plugin = normalize_plugin(
             raw_plugin,
             name,
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -691,7 +705,7 @@ mod tests {
         let err = normalize_plugin(
             raw_plugin,
             "test".to_string(),
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )
@@ -715,7 +729,7 @@ mod tests {
         let err = normalize_plugin(
             raw_plugin,
             "test".to_string(),
-            Shell::default(),
+            Some(Shell::Zsh),
             &IndexMap::new(),
             &mut Vec::new(),
         )

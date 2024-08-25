@@ -1,7 +1,7 @@
 use std::collections::BTreeMap;
 use std::path::{Path, PathBuf};
 
-use anyhow::{bail, Context as ResultExt, Result};
+use anyhow::{anyhow, bail, Context as ResultExt, Result};
 use maplit::hashmap;
 use serde::Serialize;
 
@@ -15,8 +15,8 @@ use crate::util::TEMPLATE_ENGINE;
 pub fn lock(
     ctx: &Context,
     locked_source: LockedSource,
-    global_matches: &[String],
-    global_apply: &[String],
+    global_matches: Option<&[String]>,
+    global_apply: Option<&[String]>,
     plugin: ExternalPlugin,
 ) -> Result<LockedExternalPlugin> {
     let ExternalPlugin {
@@ -29,7 +29,14 @@ pub fn lock(
         profiles: _,
     } = plugin;
 
-    let apply = apply.unwrap_or_else(|| global_apply.to_vec());
+    let apply = apply.map_or_else(
+        || {
+            global_apply.map(|a| a.to_vec()).ok_or_else(|| {
+                anyhow!("no global `apply` defined (help: set `shell` to use defaults)")
+            })
+        },
+        Ok,
+    )?;
     let hooks = hooks.unwrap_or(BTreeMap::new());
 
     Ok(if let Source::Remote { .. } = source {
@@ -77,13 +84,16 @@ pub fn lock(
                 bail!("failed to find any files matching any of `{:?}`", patterns);
             }
         // Otherwise we try to figure out which files to use...
-        } else {
+        } else if let Some(global_matches) = global_matches {
             for g in global_matches {
                 let pattern = render_template(g, &data)?;
                 if match_globs(dir, &[pattern], &mut files)? {
                     break;
                 }
             }
+        // Else bail :(
+        } else {
+            bail!("no `uses` or global `match` defined (help: set `shell` to use defaults)");
         }
 
         LockedExternalPlugin {
@@ -170,7 +180,14 @@ mod tests {
         let locked_source = source::lock(&ctx, plugin.source.clone()).unwrap();
         let clone_dir = dir.join("repos/github.com/rossmacarthur/sheldon-test");
 
-        let locked = lock(&ctx, locked_source, &[], &["hello".into()], plugin).unwrap();
+        let locked = lock(
+            &ctx,
+            locked_source,
+            Some(&[]),
+            Some(&["hello".into()]),
+            plugin,
+        )
+        .unwrap();
 
         assert_eq!(locked.name, String::from("test"));
         assert_eq!(locked.dir(), clone_dir);
@@ -207,8 +224,8 @@ mod tests {
         let locked = lock(
             &ctx,
             locked_source,
-            &["*.plugin.zsh".to_string()],
-            &["hello".to_string()],
+            Some(&["*.plugin.zsh".to_string()]),
+            Some(&["hello".to_string()]),
             plugin,
         )
         .unwrap();
@@ -242,8 +259,8 @@ mod tests {
         let locked = lock(
             &ctx,
             locked_source,
-            &["*doesnotexist*".to_string()],
-            &["PATH".to_string()],
+            Some(&["*doesnotexist*".to_string()]),
+            Some(&["PATH".to_string()]),
             plugin,
         )
         .unwrap();
@@ -276,7 +293,14 @@ mod tests {
         let locked_source = source::lock(&ctx, plugin.source.clone()).unwrap();
         let download_dir = dir.join("downloads/github.com/rossmacarthur/sheldon-test/raw/master");
 
-        let locked = lock(&ctx, locked_source, &[], &["hello".to_string()], plugin).unwrap();
+        let locked = lock(
+            &ctx,
+            locked_source,
+            Some(&[]),
+            Some(&["hello".to_string()]),
+            plugin,
+        )
+        .unwrap();
 
         assert_eq!(locked.name, String::from("test"));
         assert_eq!(locked.dir(), download_dir);
