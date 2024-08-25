@@ -2,7 +2,7 @@
 
 ## 0.8.0
 
-*Unreleased*
+*August 25th, 2024*
 
 ### Breaking changes
 
