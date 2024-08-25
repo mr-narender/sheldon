@@ -1,5 +1,64 @@
 # 📝 Release notes
 
+## 0.8.0
+
+*Unreleased*
+
+### Breaking changes
+
+- [Remove deprecated config key and template filters][048fde3]
+
+- [Remove deprecated directory support][2f68940]
+
+- [Stop defaulting to Zsh and allow unspecified shell.][f9842b1] This change
+  stops the shell defaulting to Zsh when unspecified and allows you to use
+  Sheldon without specifying a particular shell.
+
+- [Remove experimental Fish shell support.][a804ff2] Sheldon is shell agnostic
+  enough that you can still get support for Fish by overriding the default
+  `match`, `apply`, and `templates` values in the config file.
+
+### Features
+
+- [Support all clap complete shells.][#187] The `sheldon completions` command
+  now supports all shells that clap supports, regardless of whether they are
+  supported by Sheldon.
+
+  ```
+  sheldon completions --shell fish
+  ```
+
+- [Add Nix Flake support.][#180] This repository is now a flake, and can be
+  installed using nix profile:
+
+  ```
+  nix profile install "github:rossmacarthur/sheldon"
+  ```
+
+  *Contributed by [**DoomHammer**](https://github.com/DoomHammer)*
+
+- [Add feature flags to control dependency vendoring.][592abbe] This adds
+  various Cargo features to control the vendoring of dependencies when
+  installing Sheldon using Cargo. For example if you want to install Sheldon
+  with a vendored OpenSSL you can use the following command.
+
+  ```
+  cargo install sheldon --features vendored-openssl
+  ```
+
+  See
+  [Cargo.toml](https://github.com/rossmacarthur/sheldon/blob/trunk/Cargo.toml)
+  for more information. Or view
+  on [lib.rs](https://lib.rs/crates/sheldon/features).
+
+[048fde3]: https://github.com/rossmacarthur/sheldon/commit/048fde33b117bc14398b774c18078219d9dffa4c
+[2f68940]: https://github.com/rossmacarthur/sheldon/commit/2f68940b131f378f63fb343df3c8836b3a0dcdfa
+[f9842b1]: https://github.com/rossmacarthur/sheldon/commit/f9842b1533f511b07842bb3b01984d25933debea
+[a804ff2]: https://github.com/rossmacarthur/sheldon/commit/a804ff231e48a9c7e6895871da9ea926e017058d
+[592abbe]: https://github.com/rossmacarthur/sheldon/commit/592abbeb556ed21c821d5c3082ad1c9391b52aa5
+[#187]: https://github.com/rossmacarthur/sheldon/issues/187
+[#180]: https://github.com/rossmacarthur/sheldon/issues/180
+
 ## 0.7.4
 
 *November 19th, 2023*
