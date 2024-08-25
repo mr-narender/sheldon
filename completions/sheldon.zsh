@@ -15,7 +15,7 @@ _sheldon() {
 
     local context curcontext="$curcontext" state line
     _arguments "${_arguments_options[@]}" : \
-'--color=[Output coloring\: always, auto, or never]:WHEN: ' \
+'--color=[Output coloring]:WHEN:(auto always never)' \
 '--config-dir=[The configuration directory]:PATH:_files' \
 '--data-dir=[The data directory]:PATH:_files' \
 '--config-file=[The config file]:PATH:_files' \
@@ -40,7 +40,7 @@ _sheldon() {
         case $line[1] in
             (init)
 _arguments "${_arguments_options[@]}" : \
-'--shell=[The type of shell, accepted values are\: bash, fish, zsh]:SHELL: ' \
+'--shell=[The type of shell]:SHELL:(bash fish zsh)' \
 '-h[Print help]' \
 '--help[Print help]' \
 && ret=0
@@ -98,7 +98,7 @@ _arguments "${_arguments_options[@]}" : \
 ;;
 (completions)
 _arguments "${_arguments_options[@]}" : \
-'--shell=[The type of shell, accepted values are\: bash, zsh]:SHELL: ' \
+'--shell=[The type of shell]:SHELL:(bash elvish fish powershell zsh)' \
 '-h[Print help]' \
 '--help[Print help]' \
 && ret=0

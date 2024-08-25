@@ -50,7 +50,7 @@ _sheldon() {
             fi
             case "${prev}" in
                 --color)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "auto always never" -- "${cur}"))
                     return 0
                     ;;
                 --config-dir)
@@ -154,7 +154,7 @@ _sheldon() {
             fi
             case "${prev}" in
                 --shell)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "bash elvish fish powershell zsh" -- "${cur}"))
                     return 0
                     ;;
                 *)
@@ -186,7 +186,7 @@ _sheldon() {
             fi
             case "${prev}" in
                 --shell)
-                    COMPREPLY=($(compgen -f "${cur}"))
+                    COMPREPLY=($(compgen -W "bash fish zsh" -- "${cur}"))
                     return 0
                     ;;
                 *)

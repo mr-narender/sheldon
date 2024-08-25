@@ -140,7 +140,7 @@ fn raw_opt_init_with_invalid_shell() {
     setup();
     assert_eq!(
         raw_opt_err(&["init", "--shell", "ksh",]).kind(),
-        ErrorKind::ValueValidation
+        ErrorKind::InvalidValue
     );
 }
 

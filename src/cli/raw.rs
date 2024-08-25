@@ -2,6 +2,7 @@
 
 use std::path::PathBuf;
 
+use clap::builder::PossibleValue;
 use clap::{ArgGroup, Parser};
 use clap_complete as complete;
 use url::Url;
@@ -44,7 +45,7 @@ pub struct RawOpt {
     #[clap(long, short)]
     pub verbose: bool,
 
-    /// Output coloring: always, auto, or never.
+    /// Output coloring.
     #[clap(long, value_name = "WHEN", default_value_t)]
     pub color: ColorChoice,
 
@@ -73,7 +74,7 @@ pub struct RawOpt {
 pub enum RawCommand {
     /// Initialize a new config file.
     Init {
-        /// The type of shell, accepted values are: bash, fish, zsh.
+        /// The type of shell.
         #[clap(long, value_name = "SHELL")]
         shell: Option<Shell>,
     },
@@ -119,9 +120,9 @@ pub enum RawCommand {
 
     /// Generate completions for the given shell.
     Completions {
-        /// The type of shell, accepted values are: bash, zsh.
+        /// The type of shell.
         #[clap(long, value_name = "SHELL")]
-        shell: Shell,
+        shell: complete::Shell,
     },
 
     /// Prints detailed version information.
@@ -195,13 +196,31 @@ pub struct Add {
     pub hooks: Option<Vec<(String, String)>>,
 }
 
-impl From<Shell> for complete::Shell {
-    fn from(s: Shell) -> Self {
-        match s {
-            Shell::Bash => complete::Shell::Bash,
-            Shell::Fish => complete::Shell::Fish,
-            Shell::Zsh => complete::Shell::Zsh,
-        }
+impl clap::ValueEnum for ColorChoice {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[ColorChoice::Auto, ColorChoice::Always, ColorChoice::Never]
+    }
+
+    fn to_possible_value(&self) -> Option<PossibleValue> {
+        Some(match self {
+            ColorChoice::Auto => PossibleValue::new("auto"),
+            ColorChoice::Always => PossibleValue::new("always"),
+            ColorChoice::Never => PossibleValue::new("never"),
+        })
+    }
+}
+
+impl clap::ValueEnum for Shell {
+    fn value_variants<'a>() -> &'a [Self] {
+        &[Shell::Bash, Shell::Fish, Shell::Zsh]
+    }
+
+    fn to_possible_value(&self) -> Option<PossibleValue> {
+        Some(match self {
+            Shell::Bash => PossibleValue::new("bash"),
+            Shell::Fish => PossibleValue::new("fish"),
+            Shell::Zsh => PossibleValue::new("zsh"),
+        })
     }
 }
 

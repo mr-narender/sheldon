@@ -13,7 +13,6 @@ use std::process;
 
 use anyhow::{anyhow, Context as ResultExt, Result};
 use clap::{CommandFactory, Parser};
-use clap_complete as complete;
 
 use crate::cli::raw::{Add, RawCommand, RawOpt};
 use crate::config::{EditPlugin, GitReference, RawPlugin, Shell};
@@ -98,7 +97,6 @@ impl Opt {
                 Command::Source
             }
             RawCommand::Completions { shell } => {
-                let shell = complete::Shell::from(shell);
                 let mut app = RawOpt::command();
                 clap_complete::generate(shell, &mut app, build::CRATE_NAME, &mut io::stdout());
                 process::exit(0);
