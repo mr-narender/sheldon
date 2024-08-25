@@ -1,4 +1,4 @@
-use anyhow::{Context as ResultExt, Error, Result};
+use anyhow::{Context as ResultExt, Result};
 use once_cell::sync::Lazy;
 use serde::Serialize;
 use std::collections::BTreeMap;
@@ -18,7 +18,7 @@ struct ExternalData<'a> {
 
 impl LockedConfig {
     /// Generate the script.
-    pub fn script(&self, ctx: &Context, warnings: &mut Vec<Error>) -> Result<String> {
+    pub fn script(&self, ctx: &Context) -> Result<String> {
         static USED_GET: Lazy<Mutex<bool>> = Lazy::new(|| Mutex::new(false));
 
         let mut engine = upon::Engine::new();
@@ -103,14 +103,6 @@ impl LockedConfig {
                     ctx.log_verbose_status("Inlined", &plugin.name);
                 }
             }
-        }
-
-        if *USED_GET.lock().unwrap() {
-            warnings.push(Error::msg(
-                "use of deprecated filter `get` in [templates], please use the `?.` operator \
-                 instead.\nFor example: `{{ hooks | get: \"pre\" | nl }}` can be written `{{ \
-                 hooks?.pre | nl }}`",
-            ));
         }
 
         Ok(script)

@@ -1,7 +1,6 @@
 //! Normalize a raw config from the file into a [`Config`].
 
 use std::str;
-use std::str::FromStr;
 
 use anyhow::{anyhow, bail, Context as ResultExt, Error, Result};
 use indexmap::IndexMap;
@@ -83,30 +82,18 @@ fn normalize_plugin(
         remote,
         local,
         inline,
-        mut proto,
+        proto,
         reference,
         dir,
         uses,
         apply,
         profiles,
         hooks,
-        mut rest,
+        rest,
     } = raw_plugin;
 
     let is_reference_some = reference.is_some();
     let is_gist_or_github = gist.is_some() || github.is_some();
-
-    // Handle some deprecated items :/
-    if proto.is_none() {
-        if let Some(protocol) = try_pop_toml_value(&mut rest, "protocol") {
-            warnings.push(anyhow!(
-                "use of deprecated config key: `plugins.{name}.protocol`, please use \
-                 `plugins.{name}.proto` instead",
-                name = name,
-            ));
-            proto = Some(protocol);
-        }
-    }
 
     check_extra_toml(rest, |key| {
         warnings.push(anyhow!("unused config key: `plugins.{name}.{key}`"));
@@ -215,23 +202,6 @@ impl Source {
     fn is_git(&self) -> bool {
         matches!(*self, Self::Git { .. })
     }
-}
-
-/// Try and pop the TOML value from the table.
-fn try_pop_toml_value<T>(rest: &mut Option<toml::Value>, key: &str) -> Option<T>
-where
-    T: FromStr,
-{
-    if let Some(toml::Value::Table(table)) = rest {
-        if let Some(toml::Value::String(s)) = table.get(key) {
-            let result = s.parse().ok();
-            if result.is_some() {
-                table.remove(key);
-            }
-            return result;
-        }
-    }
-    None
 }
 
 /// Call the given function on all extra TOML keys.

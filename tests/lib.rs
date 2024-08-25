@@ -423,14 +423,6 @@ fn lock_and_source_hooks() -> io::Result<()> {
 }
 
 #[test]
-fn lock_and_source_deprecated_get_filter() -> io::Result<()> {
-    let case = TestCase::load("deprecated_get_filter")?;
-    case.run()?;
-    check_sheldon_test(&case.dirs.data).unwrap();
-    Ok(())
-}
-
-#[test]
 fn directories_default() -> io::Result<()> {
     let dirs = TestDirs::default()?;
     let case = TestCase::load_with_dirs("directories_default", dirs)?;

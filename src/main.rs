@@ -233,7 +233,7 @@ fn source(ctx: &Context, warnings: &mut Vec<Error>) -> Result<()> {
     };
 
     let script = locked_config
-        .script(ctx, warnings)
+        .script(ctx)
         .context("failed to render source")?;
 
     if to_path && locked_config.errors.is_empty() {
