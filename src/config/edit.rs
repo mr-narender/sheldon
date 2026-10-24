@@ -39,8 +39,7 @@ impl EditConfig {
         let config = include_str!("plugins.toml");
         match shell {
             Some(shell) => {
-                // FIXME: figure out how to do this with `toml_edit`, it always places
-                //        shell = ... above the header comment.
+                // FIXME: keep shell below the header when using `toml_edit`.
                 let config = config.replace(
                     "\n[plugins]",
                     &format!("\nshell = \"{shell}\"\n\n[plugins]"),
