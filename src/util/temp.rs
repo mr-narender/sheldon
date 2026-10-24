@@ -62,7 +62,8 @@ impl TempPath {
         };
         if let Some(path) = &self.path {
             fs::rename(path, new_path)?;
-            // This is so that the Drop impl doesn't try delete a non-existent file.
+            // This is so that the Drop impl doesn't try delete a non-existent
+            // file.
             self.path = None;
         }
         Ok(())

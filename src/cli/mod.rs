@@ -190,8 +190,8 @@ impl EditPlugin {
             (None, Some(s), None) => Some(GitReference::Rev(s)),
             (None, None, Some(s)) => Some(GitReference::Tag(s)),
             (None, None, None) => None,
-            // this is unreachable because these three options are in the same mutually exclusive
-            // 'git-reference' CLI group
+            // this is unreachable because these three options are in the same
+            // mutually exclusive 'git-reference' CLI group
             _ => unreachable!(),
         };
 
@@ -247,7 +247,8 @@ fn resolve_paths(
     let (config_dir, config_file) = match (config_dir, config_file) {
         // If both are set, then use them as is
         (Some(dir), Some(file)) => (dir, file),
-        // If only the config file is set, then derive the directory from the file
+        // If only the config file is set, then derive the directory from the
+        // file
         (None, Some(file)) => {
             let dir = file
                 .parent()
@@ -260,7 +261,8 @@ fn resolve_paths(
                 .to_path_buf();
             (dir, file)
         }
-        // If only the config directory is set, then derive the file from the directory
+        // If only the config directory is set, then derive the file from the
+        // directory
         (Some(dir), None) => {
             let file = dir.join("plugins.toml");
             (dir, file)
